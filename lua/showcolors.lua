@@ -66,7 +66,7 @@ M.show_colors = function()
   end
 end
 
-M.stop = function()
+M.hide_colors = function()
   local buf = vim.api.nvim_get_current_buf()
   local start_line = 0
   local end_line = vim.api.nvim_buf_line_count(buf)
@@ -86,6 +86,10 @@ M.stop = function()
     vim.cmd(command)
     ::continue::
   end
+end
+
+M.stop = function()
+  M.hide_colors()
 
   if state.bufread_id then
     vim.api.nvim_del_autocmd(state.insertchar_id)
@@ -98,15 +102,18 @@ end
 
 M.start = function()
   M.stop()
+  M.show_colors()
 
   if not state.bufread_id then
     state.bufread_id = vim.api.nvim_create_autocmd("BufReadPost", {
       callback = function()
+        M.hide_colors()
         M.show_colors()
       end,
     })
     state.insertchar_id = vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
       callback = function()
+        M.hide_colors()
         M.show_colors()
       end,
     })
